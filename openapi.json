@@ -1,0 +1,1288 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Main",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/v1/users/me": {
+      "get": {
+        "summary": "用户基本信息",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/token": {
+      "post": {
+        "summary": "登录",
+        "deprecated": false,
+        "description": "所有需要认证的 API 请求都需要在 Header 中携带 Token：\n```\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\n```\n所有需要认证的接口，如果返回 401 状态码，就返回到登陆页面重新获取新的token。\n\n* 登录接口返回401说明登录的信息有问题，可以看message了解是什么错误 *\n",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "jwt token"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "description": "bearer"
+                    }
+                  },
+                  "required": [
+                    "access_token",
+                    "token_type"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/users/me/qa/history": {
+      "get": {
+        "summary": "历史记录",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnswerStatus"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/questions/select": {
+      "get": {
+        "summary": "选取题目",
+        "deprecated": false,
+        "description": "每次组卷可能是不同的",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "knowledge_id",
+            "in": "query",
+            "description": "如果非空，则从知识点库中抽取题目",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question": {
+                      "$ref": "#/components/schemas/Question"
+                    },
+                    "time": {
+                      "type": "string",
+                      "title": "当前时间，答题时传给后端计算学习时长"
+                    }
+                  },
+                  "required": [
+                    "question",
+                    "time"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "id": 3,
+                      "single": [
+                        {
+                          "total_score": 2,
+                          "question": {
+                            "id": 1,
+                            "question_type": "single",
+                            "description": "老持象作引满。她色该设生圆马。论米体你认。才也此整。分组单类南格们气加间。",
+                            "options": [
+                              "计织集完因说。",
+                              "非必除使响天口。"
+                            ]
+                          }
+                        },
+                        {
+                          "total_score": 7,
+                          "question": {
+                            "id": 2,
+                            "question_type": "single",
+                            "description": "想第导。技走造达确具有素二。",
+                            "options": [
+                              "各好近用会气。",
+                              "据长七多经。",
+                              "两把作制。"
+                            ]
+                          }
+                        },
+                        {
+                          "total_score": 10,
+                          "question": {
+                            "id": 3,
+                            "question_type": "single",
+                            "description": "后面力已实其办写名。多办事离前家法情。",
+                            "options": [
+                              "月义目报解油道各。",
+                              "使变住什度取求存交。",
+                              "布解值间今厂。"
+                            ]
+                          }
+                        }
+                      ],
+                      "multi": [
+                        {
+                          "total_score": 5,
+                          "question": {
+                            "id": 10,
+                            "question_type": "multi",
+                            "description": "大华把音最。道京之相或。效处品美列劳知律只。达周便。",
+                            "options": [
+                              "较体省后飞求少无标报。",
+                              "展圆物红情候电。",
+                              "属阶件。"
+                            ]
+                          }
+                        }
+                      ],
+                      "judge": [
+                        {
+                          "total_score": 9,
+                          "question": {
+                            "id": 11,
+                            "question_type": "judge",
+                            "description": "老连回月取段。受选型。张又节口结文日比几车。今马务报。"
+                          }
+                        },
+                        {
+                          "total_score": 8,
+                          "question": {
+                            "id": 12,
+                            "question_type": "judge",
+                            "description": "九取反今角管。观目处设增公太电或消。器际都包水。议统边么何立有。这来须装存。层却集当应。"
+                          }
+                        }
+                      ],
+                      "blank": [
+                        {
+                          "total_score": 7,
+                          "question": {
+                            "id": 21,
+                            "question_type": "blank",
+                            "description": "根据金属非金属地下矿山重大事故隐患判定标准，如果矿井只有<%%1%%>个独立直达地面的安全出口且安全出口的间距小于<%%2%%>米，则存在安全隐患。"
+                          }
+                        }
+                      ],
+                      "qa": [
+                        {
+                          "total_score": 8,
+                          "question": {
+                            "id": 22,
+                            "question_type": "qa",
+                            "description": "情立听照划。义需十米影便论。清算很。派干运。确听接调给化已。少包行展。"
+                          }
+                        },
+                        {
+                          "total_score": 4,
+                          "question": {
+                            "id": 22,
+                            "question_type": "qa",
+                            "description": "解程团影由确况也样。复小反长度石。"
+                          }
+                        },
+                        {
+                          "total_score": 5,
+                          "question": {
+                            "id": 25,
+                            "question_type": "qa",
+                            "description": "通点市写。据被质太亲装常众时今。"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/questions/{id}/answer": {
+      "post": {
+        "summary": "提交回答",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "answer": {
+                    "$ref": "#/components/schemas/Answer"
+                  },
+                  "time": {
+                    "type": "string",
+                    "title": "问题获取时间",
+                    "description": "问题获取的时间，用于计算学习时间"
+                  }
+                },
+                "required": [
+                  "answer",
+                  "time"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerStatus"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/leaderboards/{group}/{board_type}": {
+      "get": {
+        "summary": "获取榜单",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "group",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "class",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "class",
+                "department",
+                "company"
+              ]
+            }
+          },
+          {
+            "name": "board_type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "duration",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "duration",
+                "practice",
+                "correct"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "leaderboard": {
+                      "$ref": "#/components/schemas/Leaderboard"
+                    },
+                    "me": {
+                      "$ref": "#/components/schemas/LeaderboardEntry"
+                    }
+                  },
+                  "required": [
+                    "leaderboard",
+                    "me"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/notifications/home": {
+      "get": {
+        "summary": "首页通知消息",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notifications%20"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/users": {
+      "get": {
+        "summary": "用户表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserProfile"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "姓名"
+          },
+          "avatar": {
+            "type": "string",
+            "title": "头像"
+          },
+          "study_status": {
+            "$ref": "#/components/schemas/StudyDetails"
+          },
+          "employee_id": {
+            "type": "string",
+            "title": "工号"
+          },
+          "class": {
+            "type": "string",
+            "title": "班级"
+          },
+          "department": {
+            "type": "string",
+            "title": "部门"
+          },
+          "job_title": {
+            "type": "string",
+            "title": "职位"
+          }
+        },
+        "required": [
+          "study_status",
+          "name",
+          "avatar",
+          "employee_id",
+          "class",
+          "department",
+          "job_title"
+        ],
+        "title": "用户基本信息"
+      },
+      "ActivityStatus": {
+        "type": "object",
+        "properties": {},
+        "title": "活跃情况"
+      },
+      "StudyDetails": {
+        "type": "object",
+        "properties": {
+          "total_duration": {
+            "type": "integer",
+            "title": "累计时长",
+            "description": "单位秒"
+          },
+          "practice_count": {
+            "type": "integer",
+            "title": "练习总数"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "正确总数"
+          },
+          "knowledge_detail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KnowledgeMaster"
+            }
+          }
+        },
+        "required": [
+          "total_duration",
+          "practice_count",
+          "correct_count",
+          "knowledge_detail"
+        ],
+        "title": "学习详情"
+      },
+      "LoginDetail": {
+        "type": "object",
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "title": "工号"
+          },
+          "password": {
+            "type": "string",
+            "title": "密码"
+          }
+        },
+        "required": [
+          "employee_id",
+          "password"
+        ],
+        "title": "登录信息"
+      },
+      "Notifications ": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "内容"
+          }
+        },
+        "required": [
+          "id",
+          "content"
+        ],
+        "title": "公告"
+      },
+      "Leaderboard": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LeaderboardEntry"
+        },
+        "title": "排行榜"
+      },
+      "LeaderboardEntry": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "排名"
+          },
+          "name": {
+            "type": "string",
+            "title": "名字"
+          },
+          "avatar": {
+            "type": "string",
+            "title": "头像url"
+          },
+          "score": {
+            "type": "integer",
+            "title": "分数"
+          }
+        },
+        "required": [
+          "index",
+          "name",
+          "avatar",
+          "score"
+        ],
+        "title": "榜单个体"
+      },
+      "QAQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "题目ID",
+            "description": "ID 编号"
+          },
+          "question_type": {
+            "type": "string",
+            "title": "类型"
+          },
+          "description": {
+            "type": "string",
+            "title": "题目描述"
+          }
+        },
+        "required": [
+          "question_type",
+          "description",
+          "id"
+        ],
+        "title": "简答题"
+      },
+      "BlankFillQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "题目ID",
+            "description": "ID 编号"
+          },
+          "question_type": {
+            "type": "string",
+            "title": "类型"
+          },
+          "description": {
+            "type": "string",
+            "title": "题目描述"
+          }
+        },
+        "required": [
+          "question_type",
+          "description",
+          "id"
+        ],
+        "title": "填空题"
+      },
+      "JudgeQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "题目ID",
+            "description": "ID 编号"
+          },
+          "question_type": {
+            "type": "string",
+            "title": "类型"
+          },
+          "description": {
+            "type": "string",
+            "title": "题目描述"
+          }
+        },
+        "required": [
+          "question_type",
+          "description",
+          "id"
+        ],
+        "title": "判断题"
+      },
+      "MultiSelectionQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "题目ID",
+            "description": "ID 编号"
+          },
+          "question_type": {
+            "type": "string",
+            "title": "类型"
+          },
+          "description": {
+            "type": "string",
+            "title": "题目描述"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "选项"
+          }
+        },
+        "required": [
+          "question_type",
+          "description",
+          "options",
+          "id"
+        ],
+        "title": "多选题"
+      },
+      "SingleSelectionQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "题目ID",
+            "description": "ID 编号"
+          },
+          "question_type": {
+            "type": "string",
+            "title": "类型"
+          },
+          "description": {
+            "type": "string",
+            "title": "题目描述"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "选项"
+          }
+        },
+        "required": [
+          "question_type",
+          "description",
+          "options",
+          "id"
+        ],
+        "title": "单选题"
+      },
+      "Question": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/QAQuestion"
+          },
+          {
+            "$ref": "#/components/schemas/JudgeQuestion"
+          },
+          {
+            "$ref": "#/components/schemas/BlankFillQuestion"
+          },
+          {
+            "$ref": "#/components/schemas/MultiSelectionQuestion"
+          },
+          {
+            "$ref": "#/components/schemas/SingleSelectionQuestion"
+          }
+        ],
+        "title": "题目"
+      },
+      "QAAnswer": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "analysis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "analysis"
+        ],
+        "title": "简答题答案"
+      },
+      "BlankAnswer": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "analysis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "analysis"
+        ],
+        "title": "填空题答案"
+      },
+      "JudgeAnswers": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "boolean"
+          },
+          "analysis": {
+            "type": "string",
+            "title": "解析"
+          }
+        },
+        "required": [
+          "result",
+          "analysis"
+        ],
+        "title": "判断题答案"
+      },
+      "SingleChoiceAnswers": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Option"
+          },
+          "analysis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "analysis"
+        ],
+        "title": "单选题答案"
+      },
+      "MultipleChoiceAnswers": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            }
+          },
+          "analysis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "analysis"
+        ],
+        "title": "多选题答案"
+      },
+      "Answer": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/QAAnswer"
+          },
+          {
+            "$ref": "#/components/schemas/BlankAnswer"
+          },
+          {
+            "$ref": "#/components/schemas/JudgeAnswers"
+          },
+          {
+            "$ref": "#/components/schemas/SingleChoiceAnswers"
+          },
+          {
+            "$ref": "#/components/schemas/MultipleChoiceAnswers"
+          }
+        ],
+        "title": "答案"
+      },
+      "KnowledgeMaster": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "知识点名称"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "正确数量"
+          },
+          "total": {
+            "type": "integer",
+            "title": "知识点总数"
+          },
+          "knowledge_id": {
+            "type": "string",
+            "title": "知识点ID"
+          },
+          "is_important": {
+            "type": "boolean",
+            "title": "是否重点"
+          }
+        },
+        "required": [
+          "name",
+          "correct_count",
+          "total",
+          "knowledge_id",
+          "is_important"
+        ],
+        "title": "知识点掌握情况"
+      },
+      "AnswerStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "$ref": "#/components/schemas/Question"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/Answer"
+          },
+          "user_answer": {
+            "$ref": "#/components/schemas/Answer"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "answer",
+          "user_answer"
+        ],
+        "title": "作答情况"
+      },
+      "Option": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "序列",
+            "description": "给选项排序"
+          },
+          "content": {
+            "type": "string",
+            "title": "选项内容"
+          },
+          "choice": {
+            "type": "string",
+            "title": "序列名",
+            "description": "比如 A B C 这种选项名"
+          }
+        },
+        "required": [
+          "index",
+          "content",
+          "choice"
+        ],
+        "title": "选项"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": [],
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

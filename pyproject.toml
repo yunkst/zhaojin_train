@@ -1,0 +1,101 @@
+[tool.ruff]
+fix = true
+line-length = 120
+include = ["*.py"]
+exclude = ["alembic", ".conda", ".venv"]
+target-version = "py311"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+# 详见 https://docs.astral.sh/ruff/rules/
+select = [
+    # 基础规则
+    "A",   # flake8-builtins
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    # 更严格的规则
+    "R",      # pylint rafactor
+    "D",      # pydocstyle
+    "N",      # pep8-naming 命名规范
+    "ARG001", # 无用函数参数
+    "ASYNC",  # 检查异步代码
+    "LOG",    # flake8-logging
+    "G",      # flake8-logging-format
+    "PT",     # flake8-pytest-style
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SIM",    # flake8-simplify
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate
+    "PD",     # pandas-vet
+    "NPY",    # NumPy-specific rules
+    "FAST001",# 不使用 response_model
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "B008",  # 不要在参数默认值中执行函数调用, FastAPI Depends 需要，所以禁用该规则
+    "B904",  # 允许 FastAPI 在没有 from e 的情况下抛出 HTTPException 异常
+    "D400",  # 允许 docstring 结尾不写英文句点
+    "D415",  # 允许 docstring 结尾不写英文句点
+    "D100",  # 允许不写模块的文档字符串
+    "D103",  # 允许不写函数的文档字符串
+    "D104",  # 允许公共包不写注释
+    "RUF001", # 允许中文标点
+    "RUF002", # 允许中文标点
+    "RUF003", # 允许中文标点
+    "RET504", # 允许定义后直接返回
+]
+
+[tool.ruff.lint.pyupgrade]
+# 保护类型提示，即使文件导入了 `from __future__ import annotations`。
+keep-runtime-typing = true
+
+[tool.ruff.lint.per-file-ignores]
+# 为 test 目录下的所有 Python 文件排除特定规则
+"tests/**/*.py" = ["D"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+root = ["."]
+include = ["*.py"]
+exclude = ["alembic", ".conda", ".venv"]
+extraPaths = [
+    # conda
+    "./.conda/Lib/site-packages",
+    "./.conda/lib/python3/site-packages",
+    "./.conda/lib/python3.1/site-packages",
+    "./.conda/lib/python3.8/site-packages",
+    "./.conda/lib/python3.9/site-packages",
+    "./.conda/lib/python3.10/site-packages",
+    "./.conda/lib/python3.11/site-packages",
+    "./.conda/lib/python3.12/site-packages",
+    "./.conda/lib/python3.13/site-packages",
+    "./.conda/lib/python3.14/site-packages",
+    # venv
+    "./.venv/lib/python3.8/site-packages",
+    "./.venv/lib/python3.9/site-packages",
+    "./.venv/lib/python3.10/site-packages",
+    "./.venv/lib/python3.11/site-packages",
+    "./.venv/lib/python3.12/site-packages",
+    "./.venv/lib/python3.13/site-packages",
+    "./.venv/lib/python3.14/site-packages",
+]
+pythonVersion = "3.11"
+useLibraryCodeForTypes = true
+reportMissingImports = "information"
+reportMissingTypeStubs = "information"
+reportUnknownMemberType = "information"
+reportMissingModuleSource = "information"
+reportUnknownVariableType = "information"
+reportUnknownArgumentType = "information"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_cli = true
