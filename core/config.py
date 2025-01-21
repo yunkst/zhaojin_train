@@ -1,15 +1,18 @@
-from typing import List
+from typing import List, Optional
 from pathlib import Path
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from functools import lru_cache
-from plugins.logger.config import LoggerConfig, LogLevel, FileLoggerConfig, StreamLoggerConfig, FileAccessLoggerConfig, StreamLoggerType
+from pydantic import BaseModel
+import yaml
 from api.app import FastAPIConfig
+from plugins.logger.config import LoggerConfig, LogLevel, FileLoggerConfig, StreamLoggerConfig, FileAccessLoggerConfig, StreamLoggerType
+class PostgresSettings(BaseModel):
+    host: str = "localhost"
+    port: int = 5432
+    db: str = "zhaojin"
+    user: str = "postgres"
+    password: str = "postgres"
 
-class Settings(BaseSettings):
-    # 调试模式
+class Settings(BaseModel):
     DEBUG_MODE: bool = False
-    
-    # FastAPI配置
     fastapi: FastAPIConfig = FastAPIConfig(
         name="zhaojin",
         version="1.0.0",
@@ -17,53 +20,29 @@ class Settings(BaseSettings):
         summary="招金培训系统后端 API 文档",
         debug=DEBUG_MODE,
     )
-    
-    # API配置
     API_V1_STR: str = "/v1"
-    
-    # JWT配置
     SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24*30 # 30天
-    
-    # 数据库配置
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "zhaojin"
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    
-
-    # 日志配置
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24*30  # 30天
+    postgres: PostgresSettings = PostgresSettings()
     logger: LoggerConfig = LoggerConfig(
         level=LogLevel.INFO,
         name="zhaojin",
         file_logger=FileLoggerConfig(path="logs/zhaojin.log"),
         stream_logger=StreamLoggerConfig(type=StreamLoggerType.STDOUT),
-        file_access_logger=FileAccessLoggerConfig(path="logs/access.log")
+        file_access_logger=FileAccessLoggerConfig(path="logs/access.log"),
     )
-    
+    backend_cors_origins: List[str] = ["*"]
+
     @property
     def DATABASE_URL(self) -> str:
         """构建数据库 URL"""
-        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-    
-    # CORS配置
-    BACKEND_CORS_ORIGINS: List[str] = ["*"]
-    
-    model_config = SettingsConfigDict(
-        env_file=Path(".env"),
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-        env_prefix="APP_"
-    )
+        return f"postgresql+asyncpg://{self.postgres.user}:{self.postgres.password}@{self.postgres.host}:{self.postgres.port}/{self.postgres.db}"
 
-@lru_cache
-def get_settings() -> Settings:
-    """
-    获取配置单例
-    使用 lru_cache 确保只创建一次实例
-    """
-    return Settings()
+def load_config(config_path: str = "config.yaml") -> Settings:
+    """从YAML文件加载配置"""
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config_dict = yaml.safe_load(f)
+    return Settings.model_validate(config_dict)
 
-settings = get_settings() 
+settings = load_config()

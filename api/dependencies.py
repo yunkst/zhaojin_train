@@ -4,7 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.database import get_session
 from core.exceptions import AuthenticationError, NotFoundError
-from models.user import User
+from core.models.user import User
 from services.auth import AuthService
 from services.user import UserService
 

@@ -37,7 +37,7 @@
 ├── tests                       测试用例
 ├── alembic                     数据库迁移相关实现
 ├── alembic.ini                 数据库迁移配置文件
-├── models                      模型文件
+├── core.models                      模型文件
 ├── data                        数据文件
 ├── requirements.txt            依赖文件
 ├── Dockerfile                  Docker 镜像构建文件

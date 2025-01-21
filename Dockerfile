@@ -14,5 +14,6 @@ COPY . ./
 ENV CUDA_VISIBLE_DEVICES=0
 ENV HF_ENDPOINT=https://hf-mirror.com
 
-VOLUME [ "/app/models", "/app/logs", "/app/data", "/app/conf/config.yaml" ]
+# VOLUME [ "/app/models", "/app/logs", "/app/data", "/app/config.yaml" ]
 CMD ["python", "main.py"]
+# CMD ["tail", "-f", "/dev/null"]

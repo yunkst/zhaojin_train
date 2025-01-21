@@ -4,7 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.database import get_session
 from core.dependencies import get_current_user
-from models.user import User
+from core.models.user import User
 from schemas.user import UserInfo
 from services.user import UserService
 from services.study import (

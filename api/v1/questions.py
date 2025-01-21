@@ -6,7 +6,7 @@ from core.dependencies import get_current_user
 from core.database import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from core.exceptions import ValidationError
-from models.user import User
+from core.models.user import User
 from datetime import datetime
 router = APIRouter(prefix="/questions", tags=["题目"])
 

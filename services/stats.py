@@ -2,7 +2,7 @@ from typing import Optional, Sequence, Any
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from models.stats import StatInfo, StatInfoRecord
+from core.models.stats import StatInfo, StatInfoRecord
 from .base import BaseService
 
 class StatInfoService(BaseService[StatInfo]):

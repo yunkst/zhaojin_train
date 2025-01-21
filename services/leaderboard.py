@@ -2,9 +2,9 @@ from typing import List, Optional
 from sqlalchemy import select, String, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User
-from models.stats import StatInfo, StatType
-from models.organization import Class, Department, Company
+from core.models.user import User
+from core.models.stats import StatInfo, StatType
+from core.models.organization import Class, Department, Company
 from schemas.v1.leaderboard import LeaderboardResponse, LeaderboardEntry, GroupType, BoardType
 
 class LeaderboardService:

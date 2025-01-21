@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .database import get_session
-from models.user import User
+from core.models.user import User
 from services.auth import AuthService
 from services.user import UserService
 

@@ -3,11 +3,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from passlib.context import CryptContext
-from models.user import (
+from core.models.user import (
     User
 )
-from models.auth import JWTAuth
-from models.organization import Department
+from core.models.auth import JWTAuth
+from core.models.organization import Department
 from .base import BaseService
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

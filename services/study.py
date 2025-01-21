@@ -5,10 +5,10 @@ from sqlalchemy import Integer, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from models.study import (
+from core.models.study import (
     Knowledge, Question, UserQuestionSubmissionRecord,
 )
-from models.stats import StatInfo, StatType
+from core.models.stats import StatInfo, StatType
 from schemas.study import StudyStatus, KnowledgeDetail
 from schemas.v1.question import (
     Question as QuestionSchema, SingleSelectionQuestion, MultiSelectionQuestion,
@@ -16,7 +16,7 @@ from schemas.v1.question import (
      MultiSelectionAnswer,JudgeAnswer,SingleSelectionAnswer,BlankFillAnswer,QAAnswer,Option
 )
 from core.exceptions import ValidationError,NotFoundError
-from datetime import datetime,UTC
+from datetime import datetime,timezone
 from .base import BaseService
 
 
@@ -298,8 +298,8 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
         stmt = select(Question).where(Question.id == question_id)
         result = await db.execute(stmt)
         question = result.scalar_one_or_none()
-        submitted_at = datetime.now(UTC).isoformat()
-        duration:int = int(min((datetime.now(UTC) - start_answer_time).total_seconds(),60*20))
+        submitted_at = datetime.now(timezone.utc).isoformat()
+        duration:int = int(min((datetime.now(timezone.utc) - start_answer_time).total_seconds(),60*20))
         if not question:
             raise ValidationError(message="题目不存在")
         # 2. 验证答案正确性
