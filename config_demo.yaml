@@ -11,6 +11,12 @@ fastapi:
   host: "0.0.0.0"
   port: 8000
   root_path: ""
+  # API文档配置
+  swagger: true
+  docs_url: "/docs"
+  redoc_url: "/redoc"
+  openapi_url: "/openapi.json"
+  openapi_prefix: ""
 
 # API配置
 API_V1_STR: "/v1"
@@ -21,11 +27,12 @@ ALGORITHM: "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES: 43200  # 30天
 
 # 数据库配置
-POSTGRES_HOST: "localhost"
-POSTGRES_PORT: 5432
-POSTGRES_DB: "zhaojin"
-POSTGRES_USER: "postgres"
-POSTGRES_PASSWORD: "postgres"
+postgres:
+  host: "localhost"
+  port: 5432
+  db: "zhaojin"
+  user: "postgres"
+  password: "postgres"
 
 # 日志配置
 logger:
