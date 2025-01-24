@@ -1,5 +1,5 @@
 # https://fastapi.tiangolo.com/zh/deployment/docker/
-FROM registry.cn-hangzhou.aliyuncs.com/truth-ai/pytorch:2.2.0-cuda12.1-cudnn8-devel
+FROM registry.cn-hangzhou.aliyuncs.com/truth-ai/python:3.11.8-alpine3.18
 WORKDIR /app
 EXPOSE 8000
 LABEL MAINTAINER=Sttot

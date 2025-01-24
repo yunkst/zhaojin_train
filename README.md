@@ -6,5 +6,6 @@
 # 如何启动
 1. 复制config_demo.yaml -> config.yaml
 2. 修改 config.yaml, 主要是数据库配置
-3. 
+3. python main.py
+
 
