@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Path
+from datetime import datetime, timezone
 
 from schemas.v1.question import QuestionResponse, AnswerSubmission, AnswerHistory
 from services.study import QuestionService, UserQuestionSubmissionService
@@ -7,7 +8,7 @@ from core.database import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from core.exceptions import ValidationError
 from core.models.user import User
-from datetime import datetime
+
 router = APIRouter(prefix="/questions", tags=["题目"])
 
 
@@ -33,7 +34,7 @@ async def select_questions(
     )
     return QuestionResponse(
             question=question,
-            time=datetime.now()
+            time=datetime.now(timezone.utc)
         )
 
 @router.post("/{id}/answer", response_model=AnswerHistory)
@@ -47,11 +48,14 @@ async def submit_answer(
     """提交答案"""
     if not current_user.id:
         raise ValidationError(message="User not found")
+    
+    start_answer_time = submission.time.replace(tzinfo=timezone.utc)
+    
     result = await user_question_submission_service.submit_answer(
         db=db,
         question_id=int(id),
         user_id=current_user.id,
         answer=submission.answer,
-        start_answer_time=submission.time
+        start_answer_time=start_answer_time
     )
     return result 

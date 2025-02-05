@@ -1,7 +1,7 @@
 import http.server
 import socketserver
 
-PORT = 9001
+PORT = 9002
 
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
