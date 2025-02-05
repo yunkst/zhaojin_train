@@ -9,6 +9,7 @@ from schemas.user import UserInfo
 from services.user import UserService
 from services.study import (
     UserQuestionSubmissionService,
+    AnswerService
 )
 from schemas.study import QuestionSubmissionRecordResponse
 
@@ -49,7 +50,7 @@ async def get_qa_history(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
     submission_service: UserQuestionSubmissionService = Depends()
-):
+) -> List[QuestionSubmissionRecordResponse]:
     """获取当前用户的答题历史"""
     records = await submission_service.get_user_history(
         db,
@@ -58,16 +59,26 @@ async def get_qa_history(
         limit=limit
     )
     
-    return [
-        QuestionSubmissionRecordResponse(
-            id=str(record.id),
-            question=record.question, # type: ignore
-            answer=record.question.correct_answer, # type: ignore
-            user_answer=record.answer,
-            is_correct=record.is_correct
-        )
-        for record in records
-    ]
+    result = []
+    for record in records:
+        if not record.question:  # 如果题目不存在，跳过
+            continue
+            
+        try:
+            # 从 meta 中获取答案数据
+            user_answer = record.answer
+            result.append(QuestionSubmissionRecordResponse(
+                id=str(record.id),
+                question=record.question, # type: ignore
+                answer=record.question.correct_answer, # type: ignore
+                user_answer=user_answer,
+                is_correct=record.is_correct
+            ))
+        except Exception as e:
+            print(e)
+            continue  # 如果处理某条记录出错，跳过该记录
+    
+    return result
 
 @router.get("", response_model=List[UserInfo])
 async def get_users(

@@ -274,6 +274,47 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
         await db.flush()
 
     @classmethod
+    async def validate_answer_format(cls, answer: Answer, question_type: str) -> None:
+        """验证答案格式
+        
+        Args:
+            answer: 用户答案
+            question_type: 题目类型
+            
+        Raises:
+            ValidationError: 答案格式不正确
+        """
+        try:
+            if question_type == "judge":
+                if not isinstance(answer.result, bool):
+                    raise ValidationError(message="判断题答案必须是布尔值")
+                
+            elif question_type == "single":
+                if not isinstance(answer.result, Option):
+                    raise ValidationError(message="单选题答案必须是一个选项对象")
+            elif question_type == "multi":
+                if not isinstance(answer.result, list):
+                    raise ValidationError(message="多选题答案必须是选项列表")
+                for option in answer.result:
+                    if not isinstance(option, Option):
+                        raise ValidationError(message="多选题每个选项必须是选项对象")
+                        
+            elif question_type == "blank":
+                if not isinstance(answer.result, list):
+                    raise ValidationError(message="填空题答案必须是字符串列表")
+                for item in answer.result:
+                    if not isinstance(item, str):
+                        raise ValidationError(message="填空题每个答案必须是字符串")
+                        
+            elif question_type == "qa":
+                if not isinstance(answer.result, str):
+                    raise ValidationError(message="问答题答案必须是字符串")
+            else:
+                raise ValidationError(message=f"不支持的题目类型: {question_type}")
+        except AttributeError:
+            raise ValidationError(message=f"答案格式不正确: {answer}")
+
+    @classmethod
     async def submit_answer(
         cls,
         db: AsyncSession,
@@ -302,7 +343,11 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
         duration:int = int(min((datetime.now(timezone.utc) - start_answer_time).total_seconds(),60*20))
         if not question:
             raise ValidationError(message="题目不存在")
-        # 2. 验证答案正确性
+            
+        # 2. 验证答案格式
+        await cls.validate_answer_format(answer, question.question_type)
+        
+        # 3. 验证答案正确性
         is_correct = False
         if question.question_type == "judge":
             # 判断题
@@ -315,7 +360,7 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
             is_correct = await QuestionService.judge_multi_answer(answer, question.correct_answer) # type: ignore
         elif question.question_type in ["blank", "qa"]:
             # 填空题和问答题 - 需要完全匹配
-            is_correct = answer.result == question.correct_answer
+            is_correct = answer.result == question.correct_answer.result
         else:
             raise ValidationError(message=f"Question type {question.question_type} is not supported")
         
@@ -327,7 +372,7 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
             question_id=question_id
         )
        
-         # 3. 创建答题记录
+         # 4. 创建答题记录
         submission = UserQuestionSubmissionRecord(
             question_id=question_id,
             user_id=user_id,
@@ -343,7 +388,7 @@ class UserQuestionSubmissionService(BaseService[UserQuestionSubmissionRecord]):
         await db.commit()
         await db.refresh(submission)
         
-        # 4. 返回答题历史
+        # 5. 返回答题历史
         return AnswerHistory(
             id=str(submission.id),
             question=question, # type: ignore
