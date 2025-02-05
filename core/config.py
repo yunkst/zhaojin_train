@@ -1,5 +1,4 @@
-from typing import List, Optional
-from pathlib import Path
+from typing import List
 from pydantic import BaseModel
 import yaml
 from api.app import FastAPIConfig

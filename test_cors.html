@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CORS 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .token-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .token-input {
+            width: 80%;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        .clear-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        .clear-button:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS 测试</h1>
+    
+    <div class="token-section">
+        <h3>Bearer Token 设置</h3>
+        <input type="text" id="tokenInput" class="token-input" placeholder="输入你的 Bearer Token">
+        <button onclick="saveToken()">保存 Token</button>
+        <button onclick="clearToken()" class="clear-button">清除 Token</button>
+        <div id="tokenStatus"></div>
+    </div>
+
+    <button onclick="testRequest()">测试请求</button>
+    <button onclick="clearResult()">清除结果</button>
+    <div id="result"></div>
+
+    <script>
+        const API_URL = 'https://poc-zhaojin.truth-ai.com.cn/api/poc-backend-v2/v1/users/me';
+        
+        // Token 管理
+        function saveToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (token) {
+                localStorage.setItem('bearerToken', token);
+                updateTokenStatus('Token 已保存');
+            } else {
+                updateTokenStatus('请输入有效的 Token');
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('bearerToken');
+            document.getElementById('tokenInput').value = '';
+            updateTokenStatus('Token 已清除');
+        }
+
+        function updateTokenStatus(message) {
+            const status = document.getElementById('tokenStatus');
+            status.textContent = message;
+            setTimeout(() => {
+                status.textContent = '';
+            }, 3000);
+        }
+
+        // 页面加载时恢复保存的 token
+        window.onload = function() {
+            const savedToken = localStorage.getItem('bearerToken');
+            if (savedToken) {
+                document.getElementById('tokenInput').value = savedToken;
+                updateTokenStatus('已加载保存的 Token');
+            }
+        }
+
+        // 获取认证头
+        function getAuthHeaders() {
+            const token = localStorage.getItem('bearerToken');
+            return token ? {
+                'Authorization': `Bearer ${token}`
+            } : {};
+        }
+        
+        // 显示结果
+        function showResult(title, data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `<h3>${title}</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        // 清除结果
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // 发送请求
+        async function testRequest() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+                showResult('请求结果', data);
+            } catch (error) {
+                showResult('请求错误', error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
