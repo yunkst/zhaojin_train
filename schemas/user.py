@@ -12,7 +12,8 @@ class UserInfo(BaseModel):
     department: str
     job_title: str
     study_status: StudyStatus
-
+    department_index: int # 部门排名
+    company_index: int # 公司排名
     class Config:
         from_attributes = True
         populate_by_name = True

@@ -36,9 +36,17 @@ class Question(BaseModel):
         """题目类型"""
         return self.meta.get("type", "")
     
+    @question_type.setter
+    def question_type(self, value: str):
+        self.meta["type"] = value
+    
     @property
     def options(self) -> List[Option]:
         return self.meta.get("options", [])
+    
+    @options.setter
+    def options(self, value: List[Option]):
+        self.meta["options"] = [opt.model_dump() for opt in value]
     
     @property
     def correct_answer(self) -> Answer:
@@ -53,11 +61,19 @@ class Question(BaseModel):
             return BlankFillAnswer(**self.meta.get("correct_answer", {'analysis': '', 'result': []}))
         return QAAnswer(**self.meta.get("correct_answer", {'analysis': '', 'result': ''}))
     
+    @correct_answer.setter
+    def correct_answer(self, value: Answer):
+        self.meta["correct_answer"] = value.model_dump()
+
     @property
     def description(self) -> str:
         """题目描述"""
         return self.meta.get("description", "")
     
+    @description.setter
+    def description(self, value: str):
+        self.meta["description"] = value
+
     # 索引
     __table_args__ = (
         Index("ix_question_knowledge_id", "knowledge_id"),

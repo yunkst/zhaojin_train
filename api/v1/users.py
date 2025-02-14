@@ -9,17 +9,18 @@ from schemas.user import UserInfo
 from services.user import UserService
 from services.study import (
     UserQuestionSubmissionService,
-    AnswerService
 )
+from services.leaderboard import LeaderboardService
+from schemas.leaderboard import GroupType, BoardType
 from schemas.study import QuestionSubmissionRecordResponse
-
 router = APIRouter(prefix="/users", tags=["用户"])
 
 @router.get("/me", response_model=UserInfo)
 async def get_current_user_info(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
-    user_study_service: UserQuestionSubmissionService = Depends()
+    user_study_service: UserQuestionSubmissionService = Depends(),
+    leaderboard_service: LeaderboardService = Depends()
 ) -> UserInfo:
     """获取当前用户信息"""
     if not current_user.id:
@@ -32,6 +33,20 @@ async def get_current_user_info(
         db,
         user_id=current_user.id,
     )
+    # 获取部门排名
+    department_index = await leaderboard_service.get_user_index(
+        db,
+        user_id=current_user.id,
+        group=GroupType.DEPARTMENT,
+        board_type=BoardType.DURATION
+    )
+    # 获取公司排名
+    company_index = await leaderboard_service.get_user_index(
+        db,
+        user_id=current_user.id,
+        group=GroupType.COMPANY,
+        board_type=BoardType.DURATION
+    )
     
     return UserInfo(
         name=current_user.name,
@@ -40,7 +55,9 @@ async def get_current_user_info(
         employee_id=current_user.employee_id,
         class_=current_user.class_name, # type: ignore
         department=current_user.department_name,
-        job_title=current_user.job_title
+        job_title=current_user.job_title,
+        department_index=department_index,
+        company_index=company_index
     )
 
 @router.get("/me/qa/history", response_model=List[QuestionSubmissionRecordResponse])

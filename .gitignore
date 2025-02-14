@@ -157,3 +157,5 @@ dmypy.json
 # Config
 conf/config.yaml
 config.yaml
+
+tools/question_json/*.json

@@ -1,16 +1,9 @@
-from .base import BaseModel
-from .organization import Corporation, Company, Department, Class
-from .user import (
-    User, UserPoints, UserPointsRecord,
-    OnlineDays, OnlineDaysRecord
-)
-from .study import (
-    Knowledge, Question,
-    UserQuestionSubmissionRecord,
-    UserQuestionStudyCard,
-    UserKnowledgeEase
-)
-from .stats import StatInfo, StatInfoRecord
+from .base import *
+from .auth import *
+from .organization import *
+from .user import *
+from .study import *
+from .stats import *
 
 __all__ = [
     # Base

@@ -6,11 +6,10 @@ LABEL MAINTAINER=Sttot
 
 # 构建
 COPY requirements.txt ./
-RUN pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
-
+RUN pip install --no-cache-dir --upgrade -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 # 安装
 COPY . ./
-
+`
 ENV CUDA_VISIBLE_DEVICES=0
 ENV HF_ENDPOINT=https://hf-mirror.com
 
